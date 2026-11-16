@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>北大選課資訊指南 | NTPU Course Guide</title>
+  <meta name="description" content="國立臺北大學非官方課程資訊指南，提供學生查詢官方核實之課程與歷史修課心得，嚴禁虛構課程與假造評價。">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- 頂部導覽列 -->
+  <header class="site-header">
+    <div class="container header-container">
+      <div class="brand-group">
+        <div class="brand-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            <path d="M12 6v6"></path>
+            <path d="M9 9h6"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 class="site-title">北大選課資訊指南</h1>
+          <span class="site-en">NTPU Course Guide</span>
+        </div>
+      </div>
+      <div class="header-badges">
+        <button type="button" id="openImportBtn" class="btn-import-header" title="手動匯入官方已核實課程資料 (支援 CSV / JSON)">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          匯入官方課程 (CSV / JSON)
+        </button>
+        <span class="badge-unofficial">非官方平台</span>
+        <span class="badge-semester">115-1 真實資料查證</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 官方公告與免責提示橫幅 -->
+  <aside class="notice-banner" role="alert">
+    <div class="container notice-content">
+      <div class="notice-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      <p class="notice-text">
+        本網站非國立臺北大學官方選課系統。本站嚴格遵守資料真實性原則，不展示任何虛構課程與示範教師；教師評價為學生歷史修課經驗，僅供參考，實際課程資訊請以學校官方公告為準。
+      </p>
+    </div>
+  </aside>
+
+  <!-- 主視覺與即時搜尋區 (Hero Section) -->
+  <section class="hero-section">
+    <div class="container hero-container">
+      <div class="hero-header">
+        <h2 class="hero-title">輕鬆探索課程，找到適合自己的學習方向</h2>
+        <p class="hero-subtitle">
+          查詢國立臺北大學已核實之開課系所、授課教師、學分、上課時間與真實修課心得。所有公開資訊皆可溯源，絕不湊數編造。
+        </p>
+      </div>
+
+      <!-- 搜尋列 -->
+      <div class="search-box-wrapper">
+        <div class="search-box">
+          <span class="search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+          <input 
+            type="text" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="搜尋課程名稱、授課教師、開課系所或關鍵字..." 
+            autocomplete="off"
+            aria-label="搜尋課程"
+          >
+          <button type="button" id="searchClearBtn" class="search-clear-btn" aria-label="清除搜尋字詞" title="清除搜尋字詞">
+            &times;
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 篩選控制與狀態欄區 -->
+  <main class="container main-content">
+    <section class="filter-panel" aria-label="課程條件篩選">
+      <div class="filter-header-bar">
+        <div class="filter-title-group">
+          <span class="filter-main-title">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            課程多維度篩選
+          </span>
+          <span class="filter-count-badge" id="activeFilterBadge">篩選條件：全部課程</span>
+        </div>
+        <div class="filter-actions-group">
+          <button type="button" id="resetFiltersBtn" class="btn-reset" title="一鍵清除所有篩選條件">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+            </svg>
+            清除所有篩選
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-grid">
+        <!-- 系所篩選 -->
+        <div class="filter-control-item">
+          <label for="departmentSelect" class="filter-label">開課系所</label>
+          <div class="select-wrapper">
+            <select id="departmentSelect" class="filter-select">
+              <option value="all">全部系所</option>
+              <option value="企業管理學系">企業管理學系</option>
+              <option value="經濟學系">經濟學系</option>
+              <option value="會計學系">會計學系</option>
+              <option value="資訊工程學系">資訊工程學系</option>
+              <option value="法律學系">法律學系</option>
+              <option value="通識教育中心">通識教育中心</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 修別類型篩選 -->
+        <div class="filter-control-item">
+          <label for="typeSelect" class="filter-label">課程修別</label>
+          <div class="select-wrapper">
+            <select id="typeSelect" class="filter-select">
+              <option value="all">全部修別</option>
+              <option value="必修">必修</option>
+              <option value="選修">選修</option>
+              <option value="通識">通識</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 學分數篩選 -->
+        <div class="filter-control-item">
+          <label for="creditsSelect" class="filter-label">學分數</label>
+          <div class="select-wrapper">
+            <select id="creditsSelect" class="filter-select">
+              <option value="all">全部學分</option>
+              <option value="1">1 學分</option>
+              <option value="2">2 學分</option>
+              <option value="3">3 學分</option>
+              <option value="other">其他學分 (4學分以上)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 資料可信度與狀態篩選 -->
+        <div class="filter-control-item">
+          <label for="statusSelect" class="filter-label">資料狀態</label>
+          <div class="select-wrapper">
+            <select id="statusSelect" class="filter-select">
+              <option value="all">全部狀態 (官方已核實)</option>
+              <option value="官方資料">官方資料 (已核實)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 結果統計列 -->
+    <div class="results-meta-bar">
+      <div class="meta-stats">
+        共找到 <strong id="matchedCount">0</strong> 門課程（目前資料庫完成官方查證課程：<span id="totalCount">0</span> 門，已收錄真實教師修課心得 <span id="reviewCountBadge" class="stats-highlight">10</span> 門）
+      </div>
+      <div class="meta-legend">
+        <span class="legend-item"><span class="status-dot official"></span>官方已核實資料</span>
+      </div>
+    </div>
+
+    <!-- 課程卡片容器 (動態渲染) -->
+    <section class="course-list-section" aria-label="課程清單列表">
+      <div id="courseGrid" class="course-grid">
+        <!-- JS 動態插入已核實課程卡片 -->
+      </div>
+
+      <!-- 空結果或無查證資料提示區 -->
+      <div id="emptyState" class="empty-state" style="display: none;">
+        <div class="empty-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="9" y1="15" x2="15" y2="15"></line>
+          </svg>
+        </div>
+        <h3 class="empty-title" id="emptyTitle">目前尚無完成查證的課程資料</h3>
+        <p class="empty-desc" id="emptyDesc">
+          本站堅守資料真實性原則，已徹底清除所有示範教授與假資料，絕不為湊數而捏造排課內容。您可以點擊下方按鈕手動貼上由教務處系統匯出之 CSV 或 JSON 官方真實課程資料。
+        </p>
+        <div class="empty-actions">
+          <button type="button" id="emptyImportBtn" class="btn-primary">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            手動匯入官方課程資料 (CSV / JSON)
+          </button>
+          <button type="button" id="emptyResetBtn" class="btn-reset" style="display: none;">
+            清除搜尋條件
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 課程詳細資訊彈跳視窗 (Modal) -->
+  <div id="courseModal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalCourseName">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-top">
+          <div class="modal-badges" id="modalBadges">
+            <!-- 動態插入修別與官方核實標籤 -->
+          </div>
+          <button type="button" id="modalCloseBtn" class="modal-close-btn" aria-label="關閉詳細資訊視窗">
+            &times;
+          </button>
+        </div>
+        <h2 id="modalCourseName" class="modal-course-title">課程名稱</h2>
+        <div class="modal-subtitle">
+          <span id="modalDepartment">開課系所</span>
+          <span class="meta-dot">・</span>
+          <span id="modalId">課程代碼</span>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <!-- 資訊屬性網格 -->
+        <div class="modal-info-grid">
+          <div class="modal-info-item">
+            <span class="info-label">授課教師</span>
+            <span class="info-value" id="modalInstructor">--</span>
+          </div>
+          <div class="modal-info-item">
+            <span class="info-label">學分數</span>
+            <span class="info-value" id="modalCredits">--</span>
+          </div>
+          <div class="modal-info-item">
+            <span class="info-label">上課時間與節次</span>
+            <span class="info-value" id="modalSchedule">--</span>
+          </div>
+          <div class="modal-info-item">
+            <span class="info-label">開課學期</span>
+            <span class="info-value" id="modalSemester">--</span>
+          </div>
+        </div>
+
+        <!-- 課程介紹 -->
+        <div class="modal-section">
+          <h3 class="modal-section-title">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            課程介紹與教學目標
+          </h3>
+          <p id="modalDescription" class="modal-description-text">--</p>
+        </div>
+
+        <!-- 教師修課心得區塊 (真實學生修課心得與來源連結) -->
+        <div class="modal-section review-section">
+          <div class="review-section-header">
+            <h3 class="modal-section-title">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+              </svg>
+              教師修課心得分享
+            </h3>
+            <span id="reviewCredibilityBadge" class="review-credibility-tag">--</span>
+          </div>
+
+          <!-- 有心得時的卡片結構 -->
+          <div id="reviewCardContent" class="review-card-container">
+            <div class="review-meta-bar">
+              <span class="review-semester-tag" id="reviewSemesterText">心得所屬學期：--</span>
+              <span class="review-count-tag" id="reviewCountText">資料筆數：--</span>
+            </div>
+
+            <div class="review-detail-grid">
+              <div class="review-detail-item">
+                <span class="review-item-label">教學風格</span>
+                <p class="review-item-text" id="reviewTeachingStyle">--</p>
+              </div>
+              <div class="review-detail-item">
+                <span class="review-item-label">作業負擔</span>
+                <p class="review-item-text" id="reviewHomeworkLoad">--</p>
+              </div>
+              <div class="review-detail-item">
+                <span class="review-item-label">考試與評分方式</span>
+                <p class="review-item-text" id="reviewGradingExam">--</p>
+              </div>
+              <div class="review-detail-item">
+                <span class="review-item-label">正面心得摘要</span>
+                <p class="review-item-text" id="reviewProsSummary">--</p>
+              </div>
+              <div class="review-detail-item alert-caution">
+                <span class="review-item-label">修課注意事項</span>
+                <p class="review-item-text" id="reviewPrecautions">--</p>
+              </div>
+            </div>
+
+            <div class="review-source-action">
+              <span class="review-source-label">心得原始出處：</span>
+              <a id="reviewSourceUrl" href="#" target="_blank" rel="noopener noreferrer" class="link-external-source">
+                <span id="reviewSourcePlatform">前往原始文章連結</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- 無心得時的提示結構 -->
+          <div id="reviewEmptyNotice" class="review-empty-box" style="display: none;">
+            <div class="empty-review-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <div class="empty-review-text">
+              <strong>目前尚無已查證修課心得</strong>
+              <p>本平台嚴格審核評價來源，未經查核之課程絕不撰寫主觀評價。所有歷史修課心得不代表 115-1 授課安排。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 資料來源與可信度聲明 -->
+        <div class="modal-source-box">
+          <div class="source-item">
+            <strong>資料來源：</strong><span id="modalSource">--</span>
+          </div>
+          <div class="source-item">
+            <strong>可信度狀態：</strong><span id="modalVerificationStatus">--</span>
+          </div>
+          <p class="source-hint">
+            提醒：本網站非國立臺北大學官方選課系統。教師評價為學生個人修課經驗，僅供參考，實際課程資訊請以學校官方公告為準。
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="modalConfirmBtn" class="btn-modal-close">
+          關閉視窗
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 官方真實課程資料匯入彈窗 (Import Modal - 支援 CSV 與 JSON) -->
+  <div id="importModal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="importModalTitle">
+    <div class="modal-card import-modal-card">
+      <div class="modal-header">
+        <div class="modal-header-top">
+          <span class="tag-badge official">真實課程資料匯入介面</span>
+          <button type="button" id="importCloseBtn" class="modal-close-btn" aria-label="關閉匯入視窗">&times;</button>
+        </div>
+        <h2 id="importModalTitle" class="modal-course-title">匯入國立臺北大學真實課程資料</h2>
+        <p class="modal-subtitle">支援貼上教務處開放格式 CSV 或 JSON，未確認欄位將標註「尚未確認」，絕不虛構。</p>
+      </div>
+
+      <div class="modal-body">
+        <div class="import-format-switch">
+          <button type="button" id="tabJsonBtn" class="btn-format-tab active">JSON 格式</button>
+          <button type="button" id="tabCsvBtn" class="btn-format-tab">CSV 格式</button>
+        </div>
+
+        <div class="import-instructions">
+          <p><strong>匯入欄位規範：</strong></p>
+          <ul>
+            <li>每筆課程至少需包含：課名 (<code>name</code>)、開課系所 (<code>department</code>)、授課教師 (<code>instructor</code>)、學期 (<code>semester</code>) 與官方來源 (<code>source</code>)。</li>
+            <li>學分、時間、類型若未確認，請留空或填寫「尚未確認」，系統絕不自行猜測。</li>
+            <li>官方課程查詢系統入口：<a href="https://sea.cc.ntpu.edu.tw/pls/dev_stud/course_query_all.CHI_MAIN" target="_blank" rel="noopener noreferrer">臺北大學課程查詢 (sea.cc.ntpu.edu.tw)</a></li>
+          </ul>
+        </div>
+
+        <!-- 範本複製輔助工具 -->
+        <div class="template-tools-bar">
+          <span class="tools-bar-label" id="templateFormatLabel">標準 JSON 範本：</span>
+          <button type="button" id="copyTemplateBtn" class="btn-copy-template" title="複製範本格式至輸入框">
+            填入範本格式
+          </button>
+        </div>
+
+        <div class="import-input-area">
+          <label for="importDataTextarea" class="filter-label" id="importInputLabel">貼上課程資料 (JSON 陣列)：</label>
+          <textarea id="importDataTextarea" class="import-textarea" placeholder="請在此貼上符合規範之 JSON 或 CSV 課程資料..."></textarea>
+        </div>
+        <div id="importErrorMsg" class="import-error-msg" style="display: none;"></div>
+      </div>
+
+      <div class="modal-footer import-modal-footer">
+        <button type="button" id="importCancelBtn" class="btn-reset">取消</button>
+        <button type="button" id="importSubmitBtn" class="btn-primary">驗證並解析匯入</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 頁尾 -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-info">
+        <div class="footer-title">北大選課資訊指南 (NTPU Course Guide)</div>
+        <p class="footer-text">
+          本網站為學生課堂與自主開發之非官方課程資訊檢索平台，嚴格遵守資料真實性原則，不編造任何課程與師資。
+        </p>
+        <p class="footer-disclaimer">
+          聲明：本網站非國立臺北大學官方選課系統。教師評價為學生個人修課經驗，僅供參考，實際課程資訊請以學校官方公告為準。
+        </p>
+        <p class="footer-source-links">
+          官方來源：
+          <a href="https://sea.cc.ntpu.edu.tw/pls/dev_stud/course_query_all.CHI_MAIN" target="_blank" rel="noopener noreferrer">臺北大學課程查詢系統</a>・
+          <a href="https://sfai.ntpu.edu.tw/web/information/information.jsp?cp_id=CP1603460657954" target="_blank" rel="noopener noreferrer">校務資訊說明</a>・
+          <a href="https://www.dcard.tw/f/ntpu" target="_blank" rel="noopener noreferrer">Dcard 臺北大學板</a>
+        </p>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 NTPU Course Guide. 國立臺北大學學生自主開發專案（堅持零虛構真實資料原則）.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 腳本載入順序：先載入真實心得資料庫、課程資料庫，再載入核心邏輯 -->
+  <script src="./data/reviews.js"></script>
+  <script src="./data/courses.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>
